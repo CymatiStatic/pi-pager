@@ -1,0 +1,25 @@
+{
+    "version": "0.2.0",
+    "description": "Cross-channel alerts for agentic AI workflows: sound, Windows toast, phone/watch (ntfy), Discord, Slack, Telegram, Pushover. Auto-tags by git repo.",
+    "homepage": "https://github.com/CymatiStatic/pi-notify",
+    "license": "MIT",
+    "url": "https://github.com/CymatiStatic/pi-notify/archive/refs/tags/v0.2.0.zip",
+    "extract_dir": "pi-notify-0.2.0",
+    "post_install": [
+        "Write-Host ''",
+        "Write-Host 'pi-notify installed. Run the installer to configure:' -ForegroundColor Cyan",
+        "Write-Host \"  powershell -ExecutionPolicy Bypass -File $dir\\install.ps1\" -ForegroundColor Yellow",
+        "Write-Host ''"
+    ],
+    "bin": [
+        ["scripts\\notify.ps1", "pi-notify"],
+        ["scripts\\inbox.ps1", "pi-inbox"]
+    ],
+    "checkver": {
+        "github": "https://github.com/CymatiStatic/pi-notify"
+    },
+    "autoupdate": {
+        "url": "https://github.com/CymatiStatic/pi-notify/archive/refs/tags/v$version.zip",
+        "extract_dir": "pi-notify-$version"
+    }
+}

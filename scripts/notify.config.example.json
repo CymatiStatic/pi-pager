@@ -10,7 +10,7 @@
   "discord": {
     "enabled": false,
     "webhook_url": "",
-    "_help": "Discord -> Server Settings -> Integrations -> Webhooks -> New Webhook -> Copy URL. Paste above and set enabled=true."
+    "_help": "Discord -> Server Settings -> Integrations -> Webhooks -> New Webhook -> Copy URL."
   },
 
   "slack": {
@@ -19,12 +19,24 @@
     "_help": "Slack -> Apps -> Incoming Webhooks -> Add to workspace -> pick channel -> Copy URL."
   },
 
+  "telegram": {
+    "enabled": false,
+    "bot_token": "",
+    "chat_id": "",
+    "_help": "1) Chat @BotFather in Telegram -> /newbot -> copy token. 2) Message your new bot once. 3) curl https://api.telegram.org/bot<TOKEN>/getUpdates -> copy your chat.id."
+  },
+
+  "pushover": {
+    "enabled": false,
+    "app_token": "",
+    "user_key": "",
+    "_help": "pushover.net ($5 one-time). Create app -> copy app_token. Dashboard shows your user_key."
+  },
+
   "toast": {
     "enabled": true,
     "app_id": "PiAgent"
   },
-
-  "data_dir": "USERPROFILE/.pi-notify",
 
   "sounds": {
     "input":   { "wav": "C:\\Windows\\Media\\Windows Notify Messaging.wav", "priority": 4, "tag": "question" },

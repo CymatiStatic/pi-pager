@@ -7,7 +7,9 @@ param(
     [ValidateSet('input','done','error','warn')]
     [string]$Type = 'input',
     [string]$Message = 'Agent needs your attention',
-    [string]$Title = 'Agent'
+    [string]$Title = 'Agent',
+    [switch]$Wait = $false,
+    [int]$TimeoutSec = 120
 )
 
 $ErrorActionPreference = 'Continue'
@@ -158,4 +160,65 @@ if ($cfg.slack.enabled -and $cfg.slack.webhook_url -and $cfg.slack.webhook_url -
         & curl.exe -s --max-time 4 -H 'Content-Type: application/json' -X POST -d $curlDataArg $cfg.slack.webhook_url *>$null
         Remove-Item $tmpFile -Force -ErrorAction SilentlyContinue
     } catch { }
+}
+
+# ---------------------------------------------------------------------------
+# 6. Telegram bot
+# ---------------------------------------------------------------------------
+if ($cfg.telegram.enabled -and $cfg.telegram.bot_token -and $cfg.telegram.chat_id) {
+    try {
+        $tgUrl = "https://api.telegram.org/bot$($cfg.telegram.bot_token)/sendMessage"
+        $tgText = "$Title - ${Type}: $Message"
+        & curl.exe -s --max-time 4 -d "chat_id=$($cfg.telegram.chat_id)" --data-urlencode "text=$tgText" $tgUrl *>$null
+    } catch { }
+}
+
+# ---------------------------------------------------------------------------
+# 7. Pushover
+# ---------------------------------------------------------------------------
+if ($cfg.pushover.enabled -and $cfg.pushover.app_token -and $cfg.pushover.user_key) {
+    try {
+        $poPrio = if ($Type -eq 'error') { 1 } else { 0 }
+        & curl.exe -s --max-time 4 `
+            --form-string "token=$($cfg.pushover.app_token)" `
+            --form-string "user=$($cfg.pushover.user_key)" `
+            --form-string "title=$Title" `
+            --form-string "message=$Message" `
+            --form-string "priority=$poPrio" `
+            https://api.pushover.net/1/messages.json *>$null
+    } catch { }
+}
+
+# ---------------------------------------------------------------------------
+# 8. -Wait: block until a reply arrives on ntfy (phone responds)
+# ---------------------------------------------------------------------------
+if ($Wait) {
+    $startTs = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+    $deadline = $startTs + $TimeoutSec
+    while ([DateTimeOffset]::UtcNow.ToUnixTimeSeconds() -lt $deadline) {
+        # ntfy: no suffix -> absolute Unix timestamp; with 's' suffix it means 'X seconds ago'
+        $pollUrl = "$($cfg.ntfy.server)/$($cfg.ntfy.topic)/json?poll=1&since=$startTs"
+        $body = & curl.exe -s --max-time 4 $pollUrl 2>$null
+        if ($body) {
+            foreach ($line in ($body -split "`r?`n")) {
+                if ([string]::IsNullOrWhiteSpace($line)) { continue }
+                try {
+                    $m = $line | ConvertFrom-Json -ErrorAction Stop
+                    # Skip our own outbound messages
+                    if ($m.title -and $m.title -match '^Agent') { continue }
+                    $reply = $m.message
+                    Write-Output $reply
+                    $low = $reply.ToLower().Trim()
+                    switch -Regex ($low) {
+                        '^(y|yes|ok|approve|approved|go|accept)$' { exit 0 }
+                        '^(n|no|cancel|stop|reject|rejected)$'    { exit 1 }
+                        default { exit 0 }
+                    }
+                } catch { }
+            }
+        }
+        Start-Sleep -Seconds 2
+    }
+    Write-Output '(timeout)'
+    exit 2
 }

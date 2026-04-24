@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="url(#bgGrad)"/>
+  <!-- Bell body -->
+  <g filter="url(#glow)">
+    <path d="M256 110
+             c-70 0 -125 55 -125 125
+             v70
+             c0 15 -10 28 -22 40
+             h294
+             c-12 -12 -22 -25 -22 -40
+             v-70
+             c0 -70 -55 -125 -125 -125 z"
+          fill="white" stroke="#1f1145" stroke-width="6"/>
+    <!-- Clapper -->
+    <circle cx="256" cy="380" r="24" fill="white" stroke="#1f1145" stroke-width="6"/>
+    <!-- Handle on top -->
+    <rect x="244" y="84" width="24" height="32" rx="6" fill="white" stroke="#1f1145" stroke-width="6"/>
+  </g>
+  <!-- Pulse rings (sound waves) -->
+  <g fill="none" stroke="white" stroke-width="8" stroke-linecap="round" opacity="0.9">
+    <path d="M100 190 q-22 36 0 82"/>
+    <path d="M68 158 q-38 64 0 146"/>
+    <path d="M412 190 q22 36 0 82"/>
+    <path d="M444 158 q38 64 0 146"/>
+  </g>
+</svg>

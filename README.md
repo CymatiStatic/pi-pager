@@ -1,21 +1,57 @@
+<div align="center">
+
+<img src="assets/logo-256.png" width="160" alt="pi-notify logo"/>
+
 # pi-notify
 
-**Cross-channel alerts for agentic AI workflows.** When your AI coding agent (Pi, Claude Code, Cursor, Aider, etc.) needs your approval or finishes a long task, it pings your speakers, your desktop, and your phone / watch — automatically tagged by git repo so you know which project needs attention.
+**Cross-channel alerts for agentic AI workflows.**
+Sound. Toast. Phone. Watch. One-line call, seven delivery channels, zero babysitting.
 
-> Built for Pi, works with anything that can run a PowerShell one-liner.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
+[![PowerShell 5.1+](https://img.shields.io/badge/PowerShell-5.1%2B-blue.svg)](https://learn.microsoft.com/en-us/powershell/)
+[![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)]()
+[![Lint](https://github.com/CymatiStatic/pi-notify/actions/workflows/lint.yml/badge.svg)](https://github.com/CymatiStatic/pi-notify/actions/workflows/lint.yml)
+
+</div>
+
+---
+
+## Why
+
+When your coding agent (Pi, Claude Code, Cursor, Aider, Codex, etc.) needs approval or finishes a long build, you shouldn't have to babysit the terminal. **pi-notify** fires an instant alert across every channel you've enabled — local sound, desktop toast, phone, watch, Discord, Slack — with zero setup overhead and automatic per-project tagging.
+
+```
+Agent [full-stack-harness] Sprint 3 QA passed          ← rings on phone + desktop
+Agent [spec-tator]          Approve new feature? (y/n) ← blocks on phone reply
+Agent [pomofocus-webhook]   Deploy failed — check logs ← priority 5, bypasses DND
+```
 
 ## Features
 
 - 🔊 **Synchronous WAV sound** — reliable, no async cutoff
-- 🪟 **Windows toast** (BurntToast) — registered AppId so clicks don't spawn stray PowerShell windows
-- 📱 **Phone / watch push** via [ntfy.sh](https://ntfy.sh) — free, open-source, no account needed
-- 📬 **Two-way inbox** — text the agent from your phone, checked via `/inbox` (streaming daemon caches locally)
-- 🏷️ **Auto project tagging** — walks up to find `.git`, prefixes alerts with repo name
-- ⚙️ **Per-project overrides** — drop `.pi-notify.json` in any repo root to change topic/channels just for that project
-- 💬 **Discord + Slack webhooks** — optional redundant channels
-- 🚀 **Auto-start on login** — daemon runs silently, 0 user interaction
+- 🪟 **Windows toast** via BurntToast, registered AppId (clicks don't spawn stray PowerShell windows)
+- 📱 **Phone / watch push** via [ntfy.sh](https://ntfy.sh) — free, open-source, no account
+- 📬 **Two-way inbox** — text the agent from your phone; background daemon caches to local log
+- ⏳ **`-Wait` flag** — block until your phone replies (`yes`/`no` → exit code)
+- 🏷️ **Auto project tagging** — walks up to find `.git`, prefixes every alert with repo name
+- ⚙️ **Per-project overrides** via `.pi-notify.json` in any repo
+- 💬 **Optional channels**: Discord, Slack, Telegram, Pushover
+- 🚀 **Auto-start on login** (Windows), no daemon supervision needed
+- 🐚 **Cross-platform** — `notify.ps1` (Windows) + `notify.sh` (macOS/Linux)
 
-## Install (Windows)
+## Preview
+
+<div align="center">
+<img src="assets/social-1280x640.png" width="720" alt="pi-notify preview"/>
+</div>
+
+> **Note:** Live screenshots of the toast, phone push, and ntfy inbox coming soon — see [Roadmap](#roadmap). PRs with screenshots welcome.
+
+---
+
+## Install
+
+### Windows — One-command installer (recommended)
 
 ```powershell
 git clone https://github.com/CymatiStatic/pi-notify.git
@@ -24,66 +60,128 @@ powershell -ExecutionPolicy Bypass -File install.ps1
 ```
 
 The installer:
-1. Generates a random private ntfy topic
+1. Generates a random private ntfy topic (or use `-Topic "existing"` to preserve)
 2. Creates `~/.pi-notify/` data dir with config
-3. Installs BurntToast (if missing) and registers the `PiAgent` AppId
+3. Installs [BurntToast](https://github.com/Windos/BurntToast) and registers the `PiAgent` AppId
 4. Adds a Startup shortcut so the daemon auto-launches on login
 5. Prints your topic name + ntfy app install links
+
+### Windows — Scoop (coming soon)
+
+```powershell
+scoop bucket add pi-notify https://github.com/CymatiStatic/pi-notify
+scoop install pi-notify
+```
+> *Scoop manifest is at `packaging/scoop/pi-notify.json`. Waiting on first tagged release to finalize the URL/hash.*
+
+### Windows — PowerShell Gallery (coming soon)
+
+```powershell
+Install-Module -Name PiNotify -Scope CurrentUser
+# Then:
+Send-PiNotify -Type done -Message 'Build passed'
+```
+> *Module is ready at `module/`. Publish requires an NuGet API key — see [PUBLISHING.md](docs/PUBLISHING.md).*
+
+### macOS — Homebrew (coming soon)
+
+```bash
+brew tap CymatiStatic/pi-notify
+brew install pi-notify
+```
+> *Formula at `packaging/homebrew/pi-notify.rb`. Needs the release tarball SHA before first publish.*
+
+### macOS / Linux — Manual
+
+```bash
+git clone https://github.com/CymatiStatic/pi-notify.git ~/.pi-notify-repo
+ln -s ~/.pi-notify-repo/scripts/notify.sh /usr/local/bin/pi-notify
+chmod +x ~/.pi-notify-repo/scripts/notify.sh
+# Generate config:
+mkdir -p ~/.pi-notify
+cp ~/.pi-notify-repo/scripts/notify.config.example.json ~/.pi-notify/notify.config.json
+# Edit ~/.pi-notify/notify.config.json and replace the topic placeholder
+```
+
+## Phone Setup
+
+1. Install the **ntfy** app:
+   - iOS: [App Store](https://apps.apple.com/us/app/ntfy/id1625396347)
+   - Android: [Play Store](https://play.google.com/store/apps/details?id=io.heckel.ntfy) · [F-Droid](https://f-droid.org/packages/io.heckel.ntfy/)
+2. Open the app → **Subscribe to topic** → paste the topic the installer printed.
+3. Done — every alert now pings your phone and watch.
+
+---
 
 ## Usage
 
 ```powershell
-# Fire alerts manually (your agent should do this automatically — see Agent Integration below)
-powershell -File scripts/notify.ps1 -Type input -Message "Need your approval"
-powershell -File scripts/notify.ps1 -Type done  -Message "Build passed"
-powershell -File scripts/notify.ps1 -Type warn  -Message "Tests flaky"
-powershell -File scripts/notify.ps1 -Type error -Message "Deploy failed"
+# Fire alerts (agent does this automatically — see Agent Integration)
+pwsh -File scripts/notify.ps1 -Type input -Message "Deploy to prod?"
+pwsh -File scripts/notify.ps1 -Type done  -Message "Build passed"
+pwsh -File scripts/notify.ps1 -Type warn  -Message "Tests flaky"
+pwsh -File scripts/notify.ps1 -Type error -Message "Deploy failed"
 
-# Read messages you sent from your phone
-powershell -File scripts/inbox.ps1                 # last 10 min
-powershell -File scripts/inbox.ps1 -Since 1h       # last hour
-powershell -File scripts/inbox.ps1 -IncludePi      # also show agent's outbound alerts
+# Block until phone replies (-Wait), exit code = y/n
+$reply = pwsh -File scripts/notify.ps1 -Type input -Message "Merge PR?" -Wait -TimeoutSec 60
+echo "LASTEXITCODE=$LASTEXITCODE reply=$reply"
+#   0 = yes/ok/approve, 1 = no/cancel/reject, 2 = timeout
+
+# Read phone-sent messages
+pwsh -File scripts/inbox.ps1                  # last 10 min
+pwsh -File scripts/inbox.ps1 -Since 1h        # last hour
+pwsh -File scripts/inbox.ps1 -IncludePi       # also show agent's outbound alerts
+pwsh -File scripts/inbox.ps1 -Mark            # mark all as read (clear log)
 
 # Daemon control
-powershell -File scripts/inbox-daemon.ps1 -Status
-powershell -File scripts/inbox-daemon.ps1 -Stop
+pwsh -File scripts/inbox-daemon.ps1 -Status
+pwsh -File scripts/inbox-daemon.ps1 -Stop
+```
+
+### macOS / Linux
+
+```bash
+pi-notify --type done --message "Build passed"
+pi-notify --type input --message "Deploy?" --wait --timeout 60
+echo "exit=$?"
 ```
 
 ## Agent Integration
 
-Drop-in prompt snippets for each agent are in `examples/agent-prompts/`:
+Drop-in prompt snippets in [`examples/agent-prompts/`](examples/agent-prompts/):
 
-| Agent | File | Where to paste |
-|-------|------|----------------|
-| **Pi** | `pi-SYSTEM.md` | `~/.pi/agent/SYSTEM.md` |
-| **Claude Code** | `claude-code-CLAUDE.md` | `~/CLAUDE.md` or project `CLAUDE.md` |
-| **Cursor** | `cursor-rules.md` | `.cursorrules` at repo root |
+| Agent | File | Paste into |
+|-------|------|------------|
+| **Pi** | [`pi-SYSTEM.md`](examples/agent-prompts/pi-SYSTEM.md) | `~/.pi/agent/SYSTEM.md` |
+| **Claude Code** | [`claude-code-CLAUDE.md`](examples/agent-prompts/claude-code-CLAUDE.md) | `~/CLAUDE.md` or project `CLAUDE.md` |
+| **Cursor** | [`cursor-rules.md`](examples/agent-prompts/cursor-rules.md) | `.cursorrules` at repo root |
 
-The snippet teaches the agent to fire `notify.ps1` before asking for input, after long tasks, on errors, and on warnings.
+The snippet teaches the agent *when* to fire each alert type. Rule of thumb: **one fire per attention event**, never on every tool call.
 
 ## Alert Types
 
-| Type | Sound | ntfy priority | When the agent should fire it |
-|------|-------|---------------|-------------------------------|
-| `input` | Windows Notify Messaging | 4 | Before asking user for approval/input |
+| Type | Windows sound | ntfy priority | When to fire |
+|------|---------------|---------------|--------------|
+| `input` | Windows Notify Messaging | 4 | Before asking user for approval |
 | `done`  | tada.wav | 3 | Long task finished |
-| `warn`  | Windows Notify | 3 | Non-blocking issue |
+| `warn`  | Windows Notify | 3 | Non-blocking caution |
 | `error` | Windows Critical Stop | 5 (bypass DND) | Blocker / needs human |
 
-## Multi-Project — No Separate Channels Needed
+## Multi-Project: One Channel, Auto-Tagged
 
-One topic handles every repo. Alerts are auto-prefixed with the project name:
+One topic handles every repo. Every alert is prefixed with the project name (walks up to find `.git`):
 
 ```
 Agent [full-stack-harness] Sprint 3 QA passed
-Agent [spec-tator]          Needs your approval on spec
-Agent [pomofocus-webhook]   Server crashed
+Agent [spec-tator]         Needs approval on spec
+Agent [pomofocus-webhook]  Server crashed
 ```
 
-One phone subscription, one Discord channel, clear per-project identification. If you *want* a specific project on its own channel (e.g. client work on a separate Discord), drop this in that repo root:
+One phone subscription, one Discord channel, zero config per project.
+
+**Per-project override** (drop `.pi-notify.json` in a repo root — e.g., to send client work to a different Discord):
 
 ```json
-// .pi-notify.json
 {
   "project_name": "client-acme",
   "ntfy_topic": "pi-acme-abc123def456",
@@ -92,38 +190,73 @@ One phone subscription, one Discord channel, clear per-project identification. I
 }
 ```
 
-See `examples/.pi-notify.json`.
+See [`examples/.pi-notify.json`](examples/.pi-notify.json).
 
 ## Two-Way Messaging
 
 Pi → phone is one-way by default (outbound alerts only). To text the agent **from** your phone:
 
-1. Open the ntfy app → your topic → send a message
-2. The background daemon catches it and appends to `~/.pi-notify/inbox.log`
-3. Ask the agent to run `/inbox` (or `powershell -File scripts/inbox.ps1`)
-4. Agent reads your message and acts on it
+1. Open the ntfy app → your topic → send a message.
+2. The background daemon catches it and appends to `~/.pi-notify/inbox.log`.
+3. Ask the agent to run `/inbox` (or `Get-PiInbox`).
+4. Agent reads your message and acts on it.
 
-## Portability to Another Machine
+With `-Wait`, the agent *blocks* until your phone replies — useful for remote approval:
 
-1. `git clone https://github.com/CymatiStatic/pi-notify.git`
-2. `powershell -File install.ps1 -Topic "your-existing-topic"`  ← preserves phone subscription
-3. Done. Second machine now streams the same topic; phone gets alerts from both.
+```powershell
+$answer = Send-PiNotify -Type input -Message "Deploy to prod?" -Wait -TimeoutSec 300
+# $LASTEXITCODE is 0 (yes/ok/approve), 1 (no/cancel/reject), or 2 (timeout)
+```
 
 ## Channels
 
-| Channel | Enabled by default | Config |
-|---------|-------------------|--------|
-| Local WAV sound | ✅ | `sounds.*.wav` in config |
-| Windows toast (BurntToast) | ✅ | `toast.enabled` |
-| ntfy push (phone/watch) | ✅ | `ntfy.enabled`, `ntfy.topic` |
-| Discord webhook | ❌ (opt-in) | `discord.enabled`, `discord.webhook_url` |
-| Slack webhook | ❌ (opt-in) | `slack.enabled`, `slack.webhook_url` |
+| Channel | Default | Config field | Notes |
+|---------|---------|--------------|-------|
+| Local WAV sound | ✅ | `sounds.*.wav` | Windows + macOS + Linux |
+| Windows toast (BurntToast) | ✅ | `toast.enabled` | Windows only |
+| macOS notification | ✅ | (automatic) | via `osascript` |
+| Linux notification | ✅ | (automatic) | via `notify-send` |
+| **ntfy** (phone / watch) | ✅ | `ntfy.enabled` | Free, no account |
+| Discord webhook | ❌ | `discord.webhook_url` | Free, instant |
+| Slack webhook | ❌ | `slack.webhook_url` | Free |
+| Telegram bot | ❌ | `telegram.bot_token` + `chat_id` | Free |
+| Pushover | ❌ | `pushover.app_token` + `user_key` | $5 one-time, most reliable |
 
-Edit `~/.pi-notify/notify.config.json` to toggle.
+Edit `~/.pi-notify/notify.config.json` to enable any of the opt-in channels.
 
-## Self-Hosted ntfy (Optional)
+### Enabling Discord
+1. Server Settings → Integrations → Webhooks → **New Webhook**
+2. Pick a channel, copy URL
+3. Set `discord.enabled: true` and paste URL into `discord.webhook_url`
 
-For full privacy, replace `ntfy.server` in config with your self-hosted URL:
+### Enabling Telegram
+1. Chat [@BotFather](https://t.me/BotFather) → `/newbot` → save the token
+2. Message your new bot once (any text)
+3. `curl https://api.telegram.org/bot<TOKEN>/getUpdates` → find `chat.id`
+4. Set `telegram.enabled: true`, paste token + chat id
+
+### Enabling Pushover
+1. Create an app at [pushover.net/apps/build](https://pushover.net/apps/build) → copy API token
+2. Your user key is on the [dashboard](https://pushover.net)
+3. Set `pushover.enabled: true` and paste both
+
+## Self-Hosted ntfy (Optional Privacy Upgrade)
+
+By default, messages go through `https://ntfy.sh` (the free public relay). The topic name is your "password" — anyone who guesses it can send you notifications. For true privacy, self-host ntfy in Docker:
+
+```yaml
+# docker-compose.yml
+services:
+  ntfy:
+    image: binwiederhier/ntfy
+    command: serve
+    volumes:
+      - ./cache:/var/cache/ntfy
+    ports:
+      - "9191:80"
+```
+
+Then update `ntfy.server` in your config:
 
 ```json
 "ntfy": { "enabled": true, "server": "https://ntfy.mydomain.com", "topic": "..." }
@@ -131,12 +264,13 @@ For full privacy, replace `ntfy.server` in config with your self-hosted URL:
 
 See [ntfy self-hosting docs](https://docs.ntfy.sh/install/).
 
-## Uninstall
+---
 
-```powershell
-powershell -ExecutionPolicy Bypass -File uninstall.ps1
-# Optionally also: Uninstall-Module BurntToast
-```
+## Portability to Another Machine
+
+1. `git clone https://github.com/CymatiStatic/pi-notify.git`
+2. `powershell -File install.ps1 -Topic "your-existing-topic"` ← preserves your phone subscription
+3. Done. Second machine streams the same topic; phone gets alerts from both machines.
 
 ## Architecture
 
@@ -146,10 +280,12 @@ powershell -ExecutionPolicy Bypass -File uninstall.ps1
 │  (Pi, Claude     │      │                           │
 │   Code, Cursor)  │      │  ┌──────────────────────┐ │
 └──────────────────┘      │  │ 1. WAV (sync)        │ │
-                          │  │ 2. Toast (BurntToast)│ │
-                          │  │ 3. ntfy POST         │─┼──> phone/watch
-                          │  │ 4. Discord webhook   │─┼──> Discord
-                          │  │ 5. Slack webhook     │─┼──> Slack
+                          │  │ 2. Toast             │ │
+                          │  │ 3. ntfy POST         │─┼──> phone / watch
+                          │  │ 4. Discord           │─┼──> Discord
+                          │  │ 5. Slack             │─┼──> Slack
+                          │  │ 6. Telegram          │─┼──> Telegram
+                          │  │ 7. Pushover          │─┼──> Pushover
                           │  └──────────────────────┘ │
                           └──────────────────────────┘
 
@@ -160,9 +296,8 @@ powershell -ExecutionPolicy Bypass -File uninstall.ps1
                                        ▼
                           ┌──────────────────────────┐
                           │ inbox-daemon.ps1         │
-                          │  (streams, appends NDJSON)│
+                          │  (streams NDJSON, appends)│
                           └────────────┬─────────────┘
-                                       │
                                        ▼
                           ┌──────────────────────────┐
                           │ ~/.pi-notify/inbox.log   │
@@ -170,19 +305,69 @@ powershell -ExecutionPolicy Bypass -File uninstall.ps1
                           └──────────────────────────┘
 ```
 
-## Requirements
+## Known Issues
 
-- Windows 10 / 11 (macOS & Linux support: PRs welcome)
-- PowerShell 5.1+ (ships with Windows)
-- `curl.exe` (ships with Windows 10 1803+)
+- **Toast click opens random PowerShell window.** Fixed in install.ps1 by registering the `PiAgent` AppId via BurntToast's `New-BTShortcut`. If you see this, run `install.ps1` again.
+- **First `SystemSounds.Play()` call silent.** We use `Media.SoundPlayer.PlaySync()` instead — always audible, blocks correctly.
+- **`Invoke-WebRequest` mangles NDJSON on some PS 5.1 systems.** We shell out to `curl.exe` (built into Windows 10+) for HTTP.
+- **ntfy `poll=1` returns only messages still in cache.** Free tier caches ~12h. The background daemon mitigates this by streaming continuously.
+- **No built-in auth on public ntfy.sh.** Topics are security-through-obscurity. For real auth, self-host or use ntfy Pro.
+- **macOS / Linux `-Wait` polls (not streams).** The bash script uses 2-second polling; the daemon (PowerShell-only today) streams. Cross-platform daemon is on the roadmap.
+- **Unicode in titles from git-bash terminal.** `curl.exe` called from MSYS-bash sometimes mangles em-dash / bullet characters. We use ASCII `[brackets]` instead.
+
+## Troubleshooting
+
+| Symptom | Fix |
+|---------|-----|
+| No sound plays | Verify `Media.SoundPlayer` works: `powershell -NoProfile -Command "(New-Object Media.SoundPlayer 'C:\Windows\Media\tada.wav').PlaySync()"` |
+| No toast shown | Check BurntToast: `Get-Module -ListAvailable BurntToast` — reinstall via `install.ps1` |
+| No phone push | `curl https://ntfy.sh/YOUR_TOPIC/json?poll=1&since=10m` — if empty, topic mismatch |
+| Inbox empty despite messages | Check daemon: `pwsh -File scripts/inbox-daemon.ps1 -Status`. If dead, relaunch via the Startup shortcut or run install.ps1 |
+| `curl.exe: command not found` | Windows 10 1803+ ships it. On older Windows, install [curl](https://curl.se/windows/) or Git for Windows |
+| PowerShell says "cannot be loaded because running scripts is disabled" | Use `-ExecutionPolicy Bypass` flag or `Set-ExecutionPolicy RemoteSigned -Scope CurrentUser` |
+| Toast click still opens PowerShell | Run `install.ps1` again — it re-registers the `PiAgent` AppId via `New-BTShortcut` |
+
+## Uninstall
+
+```powershell
+powershell -ExecutionPolicy Bypass -File uninstall.ps1
+# optional: Uninstall-Module BurntToast
+```
+
+Removes: Startup shortcut, `~/.pi-notify/` data dir, running daemon.
+Keeps: BurntToast module (shared with other apps), cloned repo.
+
+## Roadmap
+
+- [x] Windows support (v0.1.0)
+- [x] Cross-platform `notify.sh` (v0.2.0)
+- [x] Telegram + Pushover channels (v0.2.0)
+- [x] `-Wait` for phone approval (v0.2.0)
+- [x] PowerShell module scaffold (v0.2.0)
+- [x] Scoop + Homebrew packaging (v0.2.0)
+- [ ] Real screenshots / demo GIF
+- [ ] PSGallery publish (needs API key)
+- [ ] Homebrew tap repo (CymatiStatic/homebrew-pi-notify)
+- [ ] macOS / Linux background daemon
+- [ ] Apprise integration (80+ services)
+- [ ] Home Assistant integration
+- [ ] Web dashboard for inbox history
+- [ ] VS Code extension (fire pi-notify on task completion)
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Particularly interested in:
+- macOS / Linux daemon parity
+- More agent prompt templates (Aider, Continue, Zed, Codex)
+- Screenshots / demo GIF
+- Translations for alert messages
 
 ## License
 
 MIT — see [LICENSE](LICENSE).
 
-## Contributing
+---
 
-Issues and PRs welcome. Particularly interested in:
-- macOS / Linux parity scripts (`notify.sh`)
-- More agent prompt templates (Aider, Continue, Zed, etc.)
-- Alternate push channels (Telegram, Pushover, Matrix, Apprise)
+<div align="center">
+Made with 🔔 by <a href="https://github.com/CymatiStatic">CymatiStatic</a>
+</div>
