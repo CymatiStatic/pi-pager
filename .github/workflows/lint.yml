@@ -1,0 +1,65 @@
+name: Lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  pssa:
+    name: PSScriptAnalyzer
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser -SkipPublisherCheck
+
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem -Recurse -Include *.ps1
+          $results = @()
+          foreach ($f in $files) {
+            $r = Invoke-ScriptAnalyzer -Path $f.FullName -Severity Warning,Error
+            if ($r) { $results += $r }
+          }
+          if ($results) {
+            $results | Format-Table -AutoSize | Out-String | Write-Host
+            # Fail only on Errors; warnings are informational
+            $errs = @($results | Where-Object { $_.Severity -eq 'Error' })
+            if ($errs.Count -gt 0) {
+              Write-Error "PSScriptAnalyzer found $($errs.Count) error(s)"
+              exit 1
+            }
+            Write-Host "PSScriptAnalyzer: $($results.Count) warning(s), 0 errors"
+          } else {
+            Write-Host "PSScriptAnalyzer: clean"
+          }
+
+  syntax:
+    name: PowerShell Parse Check
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Parse all .ps1 files
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem -Recurse -Include *.ps1
+          $fail = $false
+          foreach ($f in $files) {
+            $errs = $null
+            [System.Management.Automation.Language.Parser]::ParseFile($f.FullName, [ref]$null, [ref]$errs) | Out-Null
+            if ($errs) {
+              Write-Host "PARSE ERROR in $($f.Name):"
+              $errs | ForEach-Object { Write-Host "  Line $($_.Extent.StartLineNumber): $($_.Message)" }
+              $fail = $true
+            } else {
+              Write-Host "OK: $($f.Name)"
+            }
+          }
+          if ($fail) { exit 1 }

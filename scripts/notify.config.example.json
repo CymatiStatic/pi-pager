@@ -1,0 +1,35 @@
+{
+  "_comment": "Template. install.ps1 generates the real config at ~/.pi-notify/notify.config.json with a random ntfy topic.",
+
+  "ntfy": {
+    "enabled": true,
+    "server": "https://ntfy.sh",
+    "topic": "REPLACE_WITH_RANDOM_TOPIC_OR_RUN_INSTALL"
+  },
+
+  "discord": {
+    "enabled": false,
+    "webhook_url": "",
+    "_help": "Discord -> Server Settings -> Integrations -> Webhooks -> New Webhook -> Copy URL. Paste above and set enabled=true."
+  },
+
+  "slack": {
+    "enabled": false,
+    "webhook_url": "",
+    "_help": "Slack -> Apps -> Incoming Webhooks -> Add to workspace -> pick channel -> Copy URL."
+  },
+
+  "toast": {
+    "enabled": true,
+    "app_id": "PiAgent"
+  },
+
+  "data_dir": "USERPROFILE/.pi-notify",
+
+  "sounds": {
+    "input":   { "wav": "C:\\Windows\\Media\\Windows Notify Messaging.wav", "priority": 4, "tag": "question" },
+    "done":    { "wav": "C:\\Windows\\Media\\tada.wav",                     "priority": 3, "tag": "white_check_mark" },
+    "warn":    { "wav": "C:\\Windows\\Media\\Windows Notify.wav",           "priority": 3, "tag": "warning" },
+    "error":   { "wav": "C:\\Windows\\Media\\Windows Critical Stop.wav",    "priority": 5, "tag": "rotating_light" }
+  }
+}

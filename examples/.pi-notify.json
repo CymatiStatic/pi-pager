@@ -1,0 +1,14 @@
+{
+  "_comment": "Drop at repo root to override global pi-notify config for this project only. All fields optional.",
+
+  "project_name": "my-project",
+
+  "ntfy_enabled": true,
+  "ntfy_topic": "pi-myproject-CUSTOM_TOPIC",
+
+  "discord_enabled": false,
+  "discord_webhook_url": "",
+
+  "slack_enabled": false,
+  "slack_webhook_url": ""
+}
