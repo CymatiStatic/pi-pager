@@ -28,7 +28,7 @@ Agent [pomofocus-webhook]   Deploy failed — check logs ← priority 5, bypasse
 
 ## Features
 
-- pending [![Listed in awesome-pi-agent](https://img.shields.io/badge/awesome-pi--agent-orange)](https://github.com/qualisero/awesome-pi-agent)
+- PR Pending [![Listed in awesome-pi-agent](https://img.shields.io/badge/awesome-pi--agent-orange)](https://github.com/qualisero/awesome-pi-agent)
 - 🔊 **Synchronous WAV sound** — reliable, no async cutoff
 - 🪟 **Windows toast** via BurntToast, registered AppId (clicks don't spawn stray PowerShell windows)
 - 📱 **Phone / watch push** via [ntfy.sh](https://ntfy.sh) — free, open-source, no account
