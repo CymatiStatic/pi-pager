@@ -1,5 +1,5 @@
 {
-  "_comment": "Template. install.ps1 generates the real config at ~/.pi-notify/notify.config.json with a random ntfy topic.",
+  "_comment": "Template. install.ps1 generates the real config at ~/.pi-pager/notify.config.json with a random ntfy topic.",
 
   "ntfy": {
     "enabled": true,

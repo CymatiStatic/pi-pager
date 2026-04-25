@@ -1,5 +1,5 @@
 {
-  "_comment": "Drop at repo root to override global pi-notify config for this project only. All fields optional.",
+  "_comment": "Drop at repo root to override global pi-pager config for this project only. All fields optional.",
 
   "project_name": "my-project",
 

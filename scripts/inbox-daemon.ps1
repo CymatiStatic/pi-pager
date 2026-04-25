@@ -1,6 +1,6 @@
 # inbox-daemon.ps1 — streams ntfy topic, appends incoming messages to local log
 # Runs silently in background. Auto-reconnects on network errors.
-# https://github.com/CymatiStatic/pi-notify
+# https://github.com/CymatiStatic/pi-pager
 
 param(
     [switch]$Stop,
@@ -8,7 +8,7 @@ param(
 )
 
 $ErrorActionPreference = 'Continue'
-$dataDir = Join-Path $env:USERPROFILE '.pi-notify'
+$dataDir = Join-Path $env:USERPROFILE '.pi-pager'
 $cfgPath = Join-Path $dataDir 'notify.config.json'
 if (-not (Test-Path $cfgPath)) { Write-Error "Config not found at $cfgPath. Run install.ps1."; exit 1 }
 $cfg = Get-Content $cfgPath -Raw | ConvertFrom-Json

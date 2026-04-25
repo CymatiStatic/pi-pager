@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# notify.sh — pi-notify for macOS & Linux
+# notify.sh — pi-pager for macOS & Linux
 # Usage: notify.sh --type input --message "Need approval"
 # Types: input | done | error | warn
-# https://github.com/CymatiStatic/pi-notify
+# https://github.com/CymatiStatic/pi-pager
 
 set -u
 
@@ -28,7 +28,7 @@ done
 case "$TYPE" in input|done|error|warn) ;; *) echo "bad --type: $TYPE" >&2; exit 2 ;; esac
 
 # --- Locate config ---
-DATA_DIR="${HOME}/.pi-notify"
+DATA_DIR="${HOME}/.pi-pager"
 CFG="${DATA_DIR}/notify.config.json"
 if [[ ! -f "$CFG" ]]; then
   echo "config not found: $CFG  (run install.sh)" >&2

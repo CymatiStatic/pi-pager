@@ -1,4 +1,4 @@
-# pi-notify — Drop-in for Cursor
+# pi-pager — Drop-in for Cursor
 
 Paste this block into `.cursorrules` at your repo root (or add to Cursor's user-level rules).
 
@@ -6,9 +6,9 @@ Replace `REPO_PATH` with your clone path.
 
 ---
 
-## Notification Protocol (pi-notify)
+## Notification Protocol (pi-pager)
 
-Before requesting user input, after completing long tasks, or on blockers, fire a pi-notify alert so the user hears a sound, sees a toast, and gets a phone ping.
+Before requesting user input, after completing long tasks, or on blockers, fire a pi-pager alert so the user hears a sound, sees a toast, and gets a phone ping.
 
 Use the terminal tool:
 ```

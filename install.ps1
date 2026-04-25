@@ -1,5 +1,5 @@
-# install.ps1 — pi-notify setup: config, BurntToast, AppId, auto-start
-# https://github.com/CymatiStatic/pi-notify
+# install.ps1 — pi-pager setup: config, BurntToast, AppId, auto-start
+# https://github.com/CymatiStatic/pi-pager
 #
 # Usage:
 #   powershell -ExecutionPolicy Bypass -File install.ps1
@@ -16,14 +16,26 @@ param(
 
 $ErrorActionPreference = 'Stop'
 Write-Host ""
-Write-Host "=== pi-notify installer ===" -ForegroundColor Cyan
+Write-Host "=== pi-pager installer ===" -ForegroundColor Cyan
 Write-Host ""
 
 $repoRoot   = Split-Path -Parent $PSCommandPath
 $scriptsDir = Join-Path $repoRoot 'scripts'
-$dataDir    = Join-Path $env:USERPROFILE '.pi-notify'
+$dataDir    = Join-Path $env:USERPROFILE '.pi-pager'
 $cfgPath    = Join-Path $dataDir 'notify.config.json'
-$examplePath = Join-Path $scriptsDir 'notify.config.example.json'
+$examplePath = Join-Path $scriptsDir 'pi-pager.config.example.json'
+
+# --- 0. Migrate from old pi-notify install if present ---
+$oldDataDir = Join-Path $env:USERPROFILE '.pi-notify'
+if ((Test-Path $oldDataDir) -and -not (Test-Path $dataDir)) {
+    Write-Host "[~] Migrating ~/.pi-notify -> ~/.pi-pager (preserves ntfy topic)"
+    Move-Item $oldDataDir $dataDir
+}
+$oldStartup = Join-Path ([Environment]::GetFolderPath('Startup')) 'pi-notify daemon.lnk'
+if (Test-Path $oldStartup) {
+    Remove-Item $oldStartup -Force -ErrorAction SilentlyContinue
+    Write-Host '[~] Removed old pi-notify startup shortcut'
+}
 
 # --- 1. Create data dir ---
 if (-not (Test-Path $dataDir)) {
@@ -41,7 +53,7 @@ if (-not $Topic) {
         Write-Host "[=] Preserving existing topic: $Topic"
     } else {
         $hex = [guid]::NewGuid().ToString('N').Substring(0, 16)
-        $Topic = "pi-notify-$hex"
+        $Topic = "pi-pager-$hex"
         Write-Host "[+] Generated random topic: $Topic"
     }
 } else {
@@ -95,12 +107,12 @@ try {
 # --- 7. Startup auto-launch ---
 if (-not $NoStartup) {
     $startup = [Environment]::GetFolderPath('Startup')
-    $shortcutPath = Join-Path $startup 'pi-notify daemon.lnk'
+    $shortcutPath = Join-Path $startup 'pi-pager daemon.lnk'
     $launcherVbs  = Join-Path $scriptsDir 'inbox-daemon-launcher.vbs'
     $WshShell = New-Object -ComObject WScript.Shell
     $sc = $WshShell.CreateShortcut($shortcutPath)
     $sc.TargetPath = $launcherVbs
-    $sc.Description = 'pi-notify inbox streaming daemon'
+    $sc.Description = 'pi-pager inbox streaming daemon'
     $sc.Save()
     Write-Host "[+] Startup shortcut: $shortcutPath"
 } else {
@@ -130,10 +142,10 @@ Write-Host "     - iOS:     https://apps.apple.com/us/app/ntfy/id1625396347"
 Write-Host "     - Android: https://play.google.com/store/apps/details?id=io.heckel.ntfy"
 Write-Host "  2. Open the app -> Subscribe to topic -> enter: $Topic"
 Write-Host "  3. Test it:"
-Write-Host "     powershell -File $scriptsDir\notify.ps1 -Type done -Message 'Hello from pi-notify'"
+Write-Host "     powershell -File $scriptsDir\notify.ps1 -Type done -Message 'Hello from pi-pager'"
 Write-Host ""
 Write-Host "Optional:"
 Write-Host "  - Edit $cfgPath to enable Discord/Slack webhooks"
-Write-Host "  - Copy examples/.pi-notify.json to any repo root for per-project overrides"
+Write-Host "  - Copy examples/.pi-pager.json to any repo root for per-project overrides"
 Write-Host "  - See examples/agent-prompts/ for drop-in rules for Pi, Claude Code, Cursor"
 Write-Host ""

@@ -1,12 +1,12 @@
-# pi-notify — Drop-in for Pi SYSTEM.md
+# pi-pager — Drop-in for Pi SYSTEM.md
 
 Paste this block into `~/.pi/agent/SYSTEM.md` (anywhere in the `[INSTRUCTIONS]` section).
 
-Replace `REPO_PATH` with the absolute path where you cloned pi-notify (e.g. `C:/Users/YOU/Dev/pi-notify`).
+Replace `REPO_PATH` with the absolute path where you cloned pi-pager (e.g. `C:/Users/YOU/Dev/pi-pager`).
 
 ---
 
-### Notification Protocol (pi-notify)
+### Notification Protocol (pi-pager)
 Fire an audible + visual + mobile alert whenever user attention is required.
 Script: `REPO_PATH/scripts/notify.ps1`
 

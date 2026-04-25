@@ -1,14 +1,14 @@
-# pi-notify — Drop-in for Claude Code CLAUDE.md
+# pi-pager — Drop-in for Claude Code CLAUDE.md
 
 Paste this block into your user-level `~/CLAUDE.md` or a project `CLAUDE.md`.
 
-Replace `REPO_PATH` with your clone path (e.g. `C:/Users/YOU/Dev/pi-notify`).
+Replace `REPO_PATH` with your clone path (e.g. `C:/Users/YOU/Dev/pi-pager`).
 
 ---
 
-## Notification Protocol (pi-notify)
+## Notification Protocol (pi-pager)
 
-Before asking the user for input, after finishing a long task, or when hitting a blocker, fire `pi-notify` to alert them via desktop + phone.
+Before asking the user for input, after finishing a long task, or when hitting a blocker, fire `pi-pager` to alert them via desktop + phone.
 
 Script: `REPO_PATH/scripts/notify.ps1`
 

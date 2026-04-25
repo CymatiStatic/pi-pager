@@ -1,4 +1,4 @@
-# Publishing pi-notify to Package Registries
+# Publishing pi-pager to Package Registries
 
 Step-by-step for releasing a new version across all distribution channels.
 
@@ -6,9 +6,9 @@ Step-by-step for releasing a new version across all distribution channels.
 
 ```powershell
 # After merging to main
-git tag -a v0.2.0 -m "pi-notify v0.2.0"
+git tag -a v0.2.0 -m "pi-pager v0.2.0"
 git push origin main --tags
-gh release create v0.2.0 --generate-notes --title "pi-notify v0.2.0"
+gh release create v0.2.0 --generate-notes --title "pi-pager v0.2.0"
 ```
 
 ## 2. PowerShell Gallery
@@ -31,75 +31,75 @@ Publish-Module -Path .\module -NuGetApiKey $plain -Repository PSGallery -Verbose
 
 Users install via:
 ```powershell
-Install-Module -Name PiNotify -Scope CurrentUser
-Import-Module PiNotify
-Send-PiNotify -Type done -Message 'Hello'
+Install-Module -Name PiPager -Scope CurrentUser
+Import-Module PiPager
+Send-PiPage -Type done -Message 'Hello'
 ```
 
 ## 3. Scoop
 
-Requires hosting `packaging/scoop/pi-notify.json` at a URL Scoop can reach. Two options:
+Requires hosting `packaging/scoop/pi-pager.json` at a URL Scoop can reach. Two options:
 
 **Option A — Host in main repo**
 ```powershell
-scoop bucket add pi-notify https://github.com/CymatiStatic/pi-notify
-scoop install pi-notify/pi-notify
+scoop bucket add pi-pager https://github.com/CymatiStatic/pi-pager
+scoop install pi-pager/pi-pager
 ```
 But Scoop by convention expects the bucket repo name to start with `scoop-` or `bucket-`. Cleaner path:
 
 **Option B — Dedicated bucket repo**
 ```bash
-gh repo create CymatiStatic/scoop-pi-notify --public
+gh repo create CymatiStatic/scoop-pi-pager --public
 cd ..
-git clone https://github.com/CymatiStatic/scoop-pi-notify.git
-cp pi-notify/packaging/scoop/pi-notify.json scoop-pi-notify/
-cd scoop-pi-notify
+git clone https://github.com/CymatiStatic/scoop-pi-pager.git
+cp pi-pager/packaging/scoop/pi-pager.json scoop-pi-pager/
+cd scoop-pi-pager
 git add . && git commit -m "Initial manifest for v0.2.0" && git push
 ```
 
 Users:
 ```powershell
-scoop bucket add cymaticstatic https://github.com/CymatiStatic/scoop-pi-notify
-scoop install pi-notify
+scoop bucket add cymaticstatic https://github.com/CymatiStatic/scoop-pi-pager
+scoop install pi-pager
 ```
 
 **Hash update on release**:
 ```powershell
-$url = "https://github.com/CymatiStatic/pi-notify/archive/refs/tags/v0.2.0.zip"
+$url = "https://github.com/CymatiStatic/pi-pager/archive/refs/tags/v0.2.0.zip"
 $hash = (Invoke-WebRequest $url -OutFile tmp.zip; Get-FileHash tmp.zip).Hash
-# Paste into packaging/scoop/pi-notify.json -> "hash" field (optional; checkver auto-updates)
+# Paste into packaging/scoop/pi-pager.json -> "hash" field (optional; checkver auto-updates)
 ```
 
 ## 4. Homebrew
 
-Requires hosting `packaging/homebrew/pi-notify.rb` in a tap repo named `homebrew-<something>`.
+Requires hosting `packaging/homebrew/pi-pager.rb` in a tap repo named `homebrew-<something>`.
 
 ```bash
-gh repo create CymatiStatic/homebrew-pi-notify --public
+gh repo create CymatiStatic/homebrew-pi-pager --public
 cd ..
-git clone https://github.com/CymatiStatic/homebrew-pi-notify.git
-mkdir -p homebrew-pi-notify/Formula
-cp pi-notify/packaging/homebrew/pi-notify.rb homebrew-pi-notify/Formula/
-cd homebrew-pi-notify
+git clone https://github.com/CymatiStatic/homebrew-pi-pager.git
+mkdir -p homebrew-pi-pager/Formula
+cp pi-pager/packaging/homebrew/pi-pager.rb homebrew-pi-pager/Formula/
+cd homebrew-pi-pager
 
-# Update the sha256 in Formula/pi-notify.rb:
-curl -sL https://github.com/CymatiStatic/pi-notify/archive/refs/tags/v0.2.0.tar.gz | shasum -a 256
+# Update the sha256 in Formula/pi-pager.rb:
+curl -sL https://github.com/CymatiStatic/pi-pager/archive/refs/tags/v0.2.0.tar.gz | shasum -a 256
 # Paste the hash into the formula's sha256 field, replacing REPLACE_WITH_SHA256...
 
-git add . && git commit -m "pi-notify 0.2.0" && git push
+git add . && git commit -m "pi-pager 0.2.0" && git push
 ```
 
 Users:
 ```bash
-brew tap CymatiStatic/pi-notify
-brew install pi-notify
+brew tap CymatiStatic/pi-pager
+brew install pi-pager
 ```
 
 Test the formula locally first:
 ```bash
-brew install --build-from-source ./Formula/pi-notify.rb
-brew test pi-notify
-brew audit --strict --online pi-notify
+brew install --build-from-source ./Formula/pi-pager.rb
+brew test pi-pager
+brew audit --strict --online pi-pager
 ```
 
 ## 5. Set GitHub Repo Social Preview
@@ -111,9 +111,9 @@ brew audit --strict --online pi-notify
 
 Or via API:
 ```bash
-gh api repos/CymatiStatic/pi-notify --method PATCH \
+gh api repos/CymatiStatic/pi-pager --method PATCH \
   -f description='Cross-channel alerts for agentic AI workflows' \
-  -f homepage='https://github.com/CymatiStatic/pi-notify'
+  -f homepage='https://github.com/CymatiStatic/pi-pager'
 # Social preview image requires web upload
 ```
 
@@ -122,7 +122,7 @@ gh api repos/CymatiStatic/pi-notify --method PATCH \
 - [ ] All tests pass (manual smoke test on Windows + Mac if possible)
 - [ ] CI green on `main`
 - [ ] `CHANGELOG.md` updated with user-facing changes
-- [ ] Version bumped in `PiNotify.psd1`, `scoop/pi-notify.json`, `homebrew/pi-notify.rb`
+- [ ] Version bumped in `PiPager.psd1`, `scoop/pi-pager.json`, `homebrew/pi-pager.rb`
 - [ ] README install instructions still accurate
 - [ ] `git tag -a vX.Y.Z` + `git push --tags`
 - [ ] `gh release create vX.Y.Z --generate-notes`

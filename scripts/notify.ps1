@@ -1,7 +1,7 @@
-# notify.ps1 — pi-notify: cross-channel alert for agentic AI workflows
+# notify.ps1 — pi-pager: cross-channel alert for agentic AI workflows
 # Usage: powershell -ExecutionPolicy Bypass -File notify.ps1 -Type input -Message "Need approval"
 # Types: input | done | error | warn
-# https://github.com/CymatiStatic/pi-notify
+# https://github.com/CymatiStatic/pi-pager
 
 param(
     [ValidateSet('input','done','error','warn')]
@@ -15,8 +15,8 @@ param(
 $ErrorActionPreference = 'Continue'
 $ProgressPreference    = 'SilentlyContinue'
 
-# --- Resolve config path ($env:USERPROFILE\.pi-notify\notify.config.json) ---
-$dataDir = Join-Path $env:USERPROFILE '.pi-notify'
+# --- Resolve config path ($env:USERPROFILE\.pi-pager\notify.config.json) ---
+$dataDir = Join-Path $env:USERPROFILE '.pi-pager'
 $cfgPath = Join-Path $dataDir 'notify.config.json'
 if (-not (Test-Path $cfgPath)) {
     Write-Error "Config not found at $cfgPath. Run install.ps1 first."
@@ -37,7 +37,7 @@ function Get-ProjectInfo {
     $override = $null
     $repoRoot = $null
     while ($dir -and (Test-Path $dir)) {
-        $ovPath = Join-Path $dir '.pi-notify.json'
+        $ovPath = Join-Path $dir '.pi-pager.json'
         if ((-not $override) -and (Test-Path $ovPath)) { $override = $ovPath }
         if ((-not $repoRoot) -and (Test-Path (Join-Path $dir '.git'))) { $repoRoot = $dir }
         $parent = Split-Path $dir -Parent
@@ -50,7 +50,7 @@ function Get-ProjectInfo {
 $proj = Get-ProjectInfo
 $projectName = $proj.Name
 
-# --- Apply per-project override if .pi-notify.json exists in repo ---
+# --- Apply per-project override if .pi-pager.json exists in repo ---
 if ($proj.OverridePath) {
     try {
         $ov = Get-Content $proj.OverridePath -Raw | ConvertFrom-Json

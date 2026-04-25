@@ -1,5 +1,5 @@
-# uninstall.ps1 — remove pi-notify startup + data (keeps BurntToast and cloned repo)
-# https://github.com/CymatiStatic/pi-notify
+# uninstall.ps1 — remove pi-pager startup + data (keeps BurntToast and cloned repo)
+# https://github.com/CymatiStatic/pi-pager
 
 param(
     [switch]$KeepData = $false
@@ -7,11 +7,11 @@ param(
 
 $ErrorActionPreference = 'Continue'
 Write-Host ""
-Write-Host "=== pi-notify uninstaller ===" -ForegroundColor Cyan
+Write-Host "=== pi-pager uninstaller ===" -ForegroundColor Cyan
 
 $repoRoot   = Split-Path -Parent $PSCommandPath
 $scriptsDir = Join-Path $repoRoot 'scripts'
-$dataDir    = Join-Path $env:USERPROFILE '.pi-notify'
+$dataDir    = Join-Path $env:USERPROFILE '.pi-pager'
 
 # 1. Stop daemon
 $daemonScript = Join-Path $scriptsDir 'inbox-daemon.ps1'
@@ -21,7 +21,7 @@ if (Test-Path $daemonScript) {
 
 # 2. Remove startup shortcut
 $startup = [Environment]::GetFolderPath('Startup')
-$shortcutPath = Join-Path $startup 'pi-notify daemon.lnk'
+$shortcutPath = Join-Path $startup 'pi-pager daemon.lnk'
 if (Test-Path $shortcutPath) {
     Remove-Item $shortcutPath -Force
     Write-Host "[-] Removed startup shortcut"

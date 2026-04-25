@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="assets/logo-256.png" width="160" alt="pi-notify logo"/>
+<img src="assets/logo-256.png" width="160" alt="pi-pager logo"/>
 
-# pi-notify
+# pi-pager
 
 **Cross-channel alerts for agentic AI workflows.**
 Sound. Toast. Phone. Watch. One-line call, seven delivery channels, zero babysitting.
@@ -10,7 +10,7 @@ Sound. Toast. Phone. Watch. One-line call, seven delivery channels, zero babysit
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 [![PowerShell 5.1+](https://img.shields.io/badge/PowerShell-5.1%2B-blue.svg)](https://learn.microsoft.com/en-us/powershell/)
 [![Platform](https://img.shields.io/badge/platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey.svg)]()
-[![Lint](https://github.com/CymatiStatic/pi-notify/actions/workflows/lint.yml/badge.svg)](https://github.com/CymatiStatic/pi-notify/actions/workflows/lint.yml)
+[![Lint](https://github.com/CymatiStatic/pi-pager/actions/workflows/lint.yml/badge.svg)](https://github.com/CymatiStatic/pi-pager/actions/workflows/lint.yml)
 
 </div>
 
@@ -18,7 +18,7 @@ Sound. Toast. Phone. Watch. One-line call, seven delivery channels, zero babysit
 
 ## Why
 
-When your coding agent (Pi, Claude Code, Cursor, Aider, Codex, etc.) needs approval or finishes a long build, you shouldn't have to babysit the terminal. **pi-notify** fires an instant alert across every channel you've enabled — local sound, desktop toast, phone, watch, Discord, Slack — with zero setup overhead and automatic per-project tagging.
+When your coding agent (Pi, Claude Code, Cursor, Aider, Codex, etc.) needs approval or finishes a long build, you shouldn't have to babysit the terminal. **pi-pager** fires an instant alert across every channel you've enabled — local sound, desktop toast, phone, watch, Discord, Slack — with zero setup overhead and automatic per-project tagging.
 
 ```
 Agent [full-stack-harness] Sprint 3 QA passed          ← rings on phone + desktop
@@ -34,7 +34,7 @@ Agent [pomofocus-webhook]   Deploy failed — check logs ← priority 5, bypasse
 - 📬 **Two-way inbox** — text the agent from your phone; background daemon caches to local log
 - ⏳ **`-Wait` flag** — block until your phone replies (`yes`/`no` → exit code)
 - 🏷️ **Auto project tagging** — walks up to find `.git`, prefixes every alert with repo name
-- ⚙️ **Per-project overrides** via `.pi-notify.json` in any repo
+- ⚙️ **Per-project overrides** via `.pi-pager.json` in any repo
 - 💬 **Optional channels**: Discord, Slack, Telegram, Pushover
 - 🚀 **Auto-start on login** (Windows), no daemon supervision needed
 - 🐚 **Cross-platform** — `notify.ps1` (Windows) + `notify.sh` (macOS/Linux)
@@ -42,7 +42,7 @@ Agent [pomofocus-webhook]   Deploy failed — check logs ← priority 5, bypasse
 ## Preview
 
 <div align="center">
-<img src="assets/social-1280x640.png" width="720" alt="pi-notify preview"/>
+<img src="assets/social-1280x640.png" width="720" alt="pi-pager preview"/>
 </div>
 
 > **Note:** Live screenshots of the toast, phone push, and ntfy inbox coming soon — see [Roadmap](#roadmap). PRs with screenshots welcome.
@@ -54,14 +54,14 @@ Agent [pomofocus-webhook]   Deploy failed — check logs ← priority 5, bypasse
 ### Windows — One-command installer (recommended)
 
 ```powershell
-git clone https://github.com/CymatiStatic/pi-notify.git
-cd pi-notify
+git clone https://github.com/CymatiStatic/pi-pager.git
+cd pi-pager
 powershell -ExecutionPolicy Bypass -File install.ps1
 ```
 
 The installer:
 1. Generates a random private ntfy topic (or use `-Topic "existing"` to preserve)
-2. Creates `~/.pi-notify/` data dir with config
+2. Creates `~/.pi-pager/` data dir with config
 3. Installs [BurntToast](https://github.com/Windos/BurntToast) and registers the `PiAgent` AppId
 4. Adds a Startup shortcut so the daemon auto-launches on login
 5. Prints your topic name + ntfy app install links
@@ -69,38 +69,38 @@ The installer:
 ### Windows — Scoop (coming soon)
 
 ```powershell
-scoop bucket add pi-notify https://github.com/CymatiStatic/pi-notify
-scoop install pi-notify
+scoop bucket add pi-pager https://github.com/CymatiStatic/pi-pager
+scoop install pi-pager
 ```
-> *Scoop manifest is at `packaging/scoop/pi-notify.json`. Waiting on first tagged release to finalize the URL/hash.*
+> *Scoop manifest is at `packaging/scoop/pi-pager.json`. Waiting on first tagged release to finalize the URL/hash.*
 
 ### Windows — PowerShell Gallery (coming soon)
 
 ```powershell
-Install-Module -Name PiNotify -Scope CurrentUser
+Install-Module -Name PiPager -Scope CurrentUser
 # Then:
-Send-PiNotify -Type done -Message 'Build passed'
+Send-PiPage -Type done -Message 'Build passed'
 ```
 > *Module is ready at `module/`. Publish requires an NuGet API key — see [PUBLISHING.md](docs/PUBLISHING.md).*
 
 ### macOS — Homebrew (coming soon)
 
 ```bash
-brew tap CymatiStatic/pi-notify
-brew install pi-notify
+brew tap CymatiStatic/pi-pager
+brew install pi-pager
 ```
-> *Formula at `packaging/homebrew/pi-notify.rb`. Needs the release tarball SHA before first publish.*
+> *Formula at `packaging/homebrew/pi-pager.rb`. Needs the release tarball SHA before first publish.*
 
 ### macOS / Linux — Manual
 
 ```bash
-git clone https://github.com/CymatiStatic/pi-notify.git ~/.pi-notify-repo
-ln -s ~/.pi-notify-repo/scripts/notify.sh /usr/local/bin/pi-notify
-chmod +x ~/.pi-notify-repo/scripts/notify.sh
+git clone https://github.com/CymatiStatic/pi-pager.git ~/.pi-pager-repo
+ln -s ~/.pi-pager-repo/scripts/notify.sh /usr/local/bin/pi-pager
+chmod +x ~/.pi-pager-repo/scripts/notify.sh
 # Generate config:
-mkdir -p ~/.pi-notify
-cp ~/.pi-notify-repo/scripts/notify.config.example.json ~/.pi-notify/notify.config.json
-# Edit ~/.pi-notify/notify.config.json and replace the topic placeholder
+mkdir -p ~/.pi-pager
+cp ~/.pi-pager-repo/scripts/notify.config.example.json ~/.pi-pager/notify.config.json
+# Edit ~/.pi-pager/notify.config.json and replace the topic placeholder
 ```
 
 ## Phone Setup
@@ -141,8 +141,8 @@ pwsh -File scripts/inbox-daemon.ps1 -Stop
 ### macOS / Linux
 
 ```bash
-pi-notify --type done --message "Build passed"
-pi-notify --type input --message "Deploy?" --wait --timeout 60
+pi-pager --type done --message "Build passed"
+pi-pager --type input --message "Deploy?" --wait --timeout 60
 echo "exit=$?"
 ```
 
@@ -179,7 +179,7 @@ Agent [pomofocus-webhook]  Server crashed
 
 One phone subscription, one Discord channel, zero config per project.
 
-**Per-project override** (drop `.pi-notify.json` in a repo root — e.g., to send client work to a different Discord):
+**Per-project override** (drop `.pi-pager.json` in a repo root — e.g., to send client work to a different Discord):
 
 ```json
 {
@@ -190,15 +190,15 @@ One phone subscription, one Discord channel, zero config per project.
 }
 ```
 
-See [`examples/.pi-notify.json`](examples/.pi-notify.json).
+See [`examples/.pi-pager.json`](examples/.pi-pager.json).
 
 ## Two-Way Messaging
 
 Pi → phone is one-way by default (outbound alerts only). To text the agent **from** your phone:
 
 1. Open the ntfy app → your topic → send a message.
-2. The background daemon catches it and appends to `~/.pi-notify/inbox.log`.
-3. Ask the agent to run `/inbox` (or `Get-PiInbox`).
+2. The background daemon catches it and appends to `~/.pi-pager/inbox.log`.
+3. Ask the agent to run `/inbox` (or `Get-PiPagerInbox`).
 4. Agent reads your message and acts on it.
 
 ### Routing to a Specific Instance (Multi-Project)
@@ -209,7 +209,7 @@ If you have multiple agent instances running across different repos, prefix your
 |---------------------|---------|
 | `harness: check deploy status` | Only the agent running in the `harness` repo |
 | `[spec-tator] approve spec` | Only the agent in `spec-tator` |
-| `pi-notify: rerun tests` | Only the agent in `pi-notify` |
+| `pi-pager: rerun tests` | Only the agent in `pi-pager` |
 | `check deploy` (no prefix) | **Broadcast** — all instances see it |
 
 `/inbox` from inside a repo automatically filters to that project + broadcasts. Use `/inbox -All` to see everything across projects, or `/inbox -Project foo` to peek at another instance's mailbox.
@@ -219,7 +219,7 @@ With `-Wait`, only replies addressed to the waiting project (or broadcasts) unbl
 With `-Wait`, the agent *blocks* until your phone replies — useful for remote approval:
 
 ```powershell
-$answer = Send-PiNotify -Type input -Message "Deploy to prod?" -Wait -TimeoutSec 300
+$answer = Send-PiPage -Type input -Message "Deploy to prod?" -Wait -TimeoutSec 300
 # $LASTEXITCODE is 0 (yes/ok/approve), 1 (no/cancel/reject), or 2 (timeout)
 ```
 
@@ -237,7 +237,7 @@ $answer = Send-PiNotify -Type input -Message "Deploy to prod?" -Wait -TimeoutSec
 | Telegram bot | ❌ | `telegram.bot_token` + `chat_id` | Free |
 | Pushover | ❌ | `pushover.app_token` + `user_key` | $5 one-time, most reliable |
 
-Edit `~/.pi-notify/notify.config.json` to enable any of the opt-in channels.
+Edit `~/.pi-pager/notify.config.json` to enable any of the opt-in channels.
 
 ### Enabling Discord
 1. Server Settings → Integrations → Webhooks → **New Webhook**
@@ -283,7 +283,7 @@ See [ntfy self-hosting docs](https://docs.ntfy.sh/install/).
 
 ## Portability to Another Machine
 
-1. `git clone https://github.com/CymatiStatic/pi-notify.git`
+1. `git clone https://github.com/CymatiStatic/pi-pager.git`
 2. `powershell -File install.ps1 -Topic "your-existing-topic"` ← preserves your phone subscription
 3. Done. Second machine streams the same topic; phone gets alerts from both machines.
 
@@ -315,7 +315,7 @@ See [ntfy self-hosting docs](https://docs.ntfy.sh/install/).
                           └────────────┬─────────────┘
                                        ▼
                           ┌──────────────────────────┐
-                          │ ~/.pi-notify/inbox.log   │
+                          │ ~/.pi-pager/inbox.log   │
                           │  (read via /inbox)       │
                           └──────────────────────────┘
 ```
@@ -349,7 +349,7 @@ powershell -ExecutionPolicy Bypass -File uninstall.ps1
 # optional: Uninstall-Module BurntToast
 ```
 
-Removes: Startup shortcut, `~/.pi-notify/` data dir, running daemon.
+Removes: Startup shortcut, `~/.pi-pager/` data dir, running daemon.
 Keeps: BurntToast module (shared with other apps), cloned repo.
 
 ## Roadmap
@@ -362,12 +362,12 @@ Keeps: BurntToast module (shared with other apps), cloned repo.
 - [x] Scoop + Homebrew packaging (v0.2.0)
 - [ ] Real screenshots / demo GIF
 - [ ] PSGallery publish (needs API key)
-- [ ] Homebrew tap repo (CymatiStatic/homebrew-pi-notify)
+- [ ] Homebrew tap repo (CymatiStatic/homebrew-pi-pager)
 - [ ] macOS / Linux background daemon
 - [ ] Apprise integration (80+ services)
 - [ ] Home Assistant integration
 - [ ] Web dashboard for inbox history
-- [ ] VS Code extension (fire pi-notify on task completion)
+- [ ] VS Code extension (fire pi-pager on task completion)
 
 ## Contributing
 

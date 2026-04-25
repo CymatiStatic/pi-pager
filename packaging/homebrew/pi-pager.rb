@@ -2,14 +2,14 @@
 # typed: false
 # frozen_string_literal: true
 
-class PiNotify < Formula
+class PiPager < Formula
   desc "Cross-channel alerts for agentic AI workflows (sound, ntfy, Discord, Slack, Telegram, Pushover)"
-  homepage "https://github.com/CymatiStatic/pi-notify"
-  url "https://github.com/CymatiStatic/pi-notify/archive/refs/tags/v0.2.1.tar.gz"
+  homepage "https://github.com/CymatiStatic/pi-pager"
+  url "https://github.com/CymatiStatic/pi-pager/archive/refs/tags/v0.3.0.tar.gz"
   # Placeholder sha256 — auto-filled by `brew create` or `brew fetch --build-from-source`
-  sha256 "REPLACE_WITH_SHA256_OF_v0.2.1.tar.gz"
+  sha256 "REPLACE_WITH_SHA256_OF_v0.3.0.tar.gz"
   license "MIT"
-  head "https://github.com/CymatiStatic/pi-notify.git", branch: "main"
+  head "https://github.com/CymatiStatic/pi-pager.git", branch: "main"
 
   depends_on "curl"
   depends_on "jq" => :recommended
@@ -17,22 +17,22 @@ class PiNotify < Formula
   def install
     libexec.install "scripts/notify.sh", "scripts/inbox.ps1", "scripts/notify.ps1",
                     "scripts/inbox-daemon.ps1", "scripts/notify.config.example.json"
-    bin.install_symlink libexec/"notify.sh" => "pi-notify"
+    bin.install_symlink libexec/"notify.sh" => "pi-pager"
 
     (prefix/"examples").install Dir["examples/*"]
     prefix.install "README.md", "LICENSE"
   end
 
   def post_install
-    data_dir = Pathname.new("#{ENV["HOME"]}/.pi-notify")
+    data_dir = Pathname.new("#{ENV["HOME"]}/.pi-pager")
     data_dir.mkpath unless data_dir.exist?
     cfg = data_dir/"notify.config.json"
     unless cfg.exist?
       require "securerandom"
-      topic = "pi-notify-#{SecureRandom.hex(8)}"
+      topic = "pi-pager-#{SecureRandom.hex(8)}"
       template = (libexec/"notify.config.example.json").read
       cfg.write(template.sub("REPLACE_WITH_RANDOM_TOPIC_OR_RUN_INSTALL", topic))
-      ohai "Generated pi-notify config at #{cfg}"
+      ohai "Generated pi-pager config at #{cfg}"
       ohai "Your ntfy topic: #{topic}"
       ohai "Install ntfy app on your phone and subscribe to that topic."
     end
@@ -40,10 +40,10 @@ class PiNotify < Formula
 
   def caveats
     <<~EOS
-      pi-notify is installed as `pi-notify`. Try:
-        pi-notify --type done --message "Hello from Homebrew"
+      pi-pager is installed as `pi-pager`. Try:
+        pi-pager --type done --message "Hello from Homebrew"
 
-      Your ntfy topic is in ~/.pi-notify/notify.config.json
+      Your ntfy topic is in ~/.pi-pager/notify.config.json
 
       Install the ntfy app on your phone:
         iOS:     https://apps.apple.com/us/app/ntfy/id1625396347
@@ -52,6 +52,6 @@ class PiNotify < Formula
   end
 
   test do
-    assert_match "Agent", shell_output("#{bin}/pi-notify --help 2>&1", 0).chomp
+    assert_match "Agent", shell_output("#{bin}/pi-pager --help 2>&1", 0).chomp
   end
 end

@@ -1,9 +1,32 @@
 # Changelog
 
-All notable changes to pi-notify are documented here.
+All notable changes to pi-pager are documented here.
 
 The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.3.0] — 2026-04-24
+
+### Changed (BREAKING)
+- **Project renamed**: `pi-notify` → `pi-pager`. The "pager" mental model is
+  clearer for async out-of-band notifications.
+- **Repo URL**: `github.com/CymatiStatic/pi-notify` → `github.com/CymatiStatic/pi-pager`
+  (GitHub auto-redirects the old URL).
+- **Data dir**: `~/.pi-notify/` → `~/.pi-pager/` (preserves config + ntfy topic;
+  install.ps1 auto-migrates if old dir exists).
+- **PowerShell module**: `PiNotify` → `PiPager`. Cmdlets renamed:
+  - `Send-PiNotify` → `Send-PiPage`
+  - `Get-PiInbox` → `Get-PiPagerInbox`
+  - `Get-PiDaemonStatus` → `Get-PiPagerDaemonStatus`
+  - `Stop-PiDaemon` → `Stop-PiPagerDaemon`
+- **Startup shortcut**: `pi-notify daemon.lnk` → `pi-pager daemon.lnk`
+- **Config filename**: `notify.config.example.json` → `pi-pager.config.example.json`
+- **Toast AppId** stays as `PiAgent` (already-registered Windows AppId; renaming
+  would orphan existing user installs).
+
+### Migration from 0.2.x
+Run `install.ps1` again — it auto-detects `~/.pi-notify/` and migrates to
+`~/.pi-pager/`, preserving your ntfy topic so phone subscriptions keep working.
 
 ## [0.2.1] — 2026-04-24
 
@@ -26,9 +49,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Telegram bot channel** — post via Bot API with chat_id
 - **Pushover channel** — priority 1 on errors (auto-bypass DND)
 - **`-Wait` flag** — block until phone replies on ntfy; exit code maps yes/no/timeout
-- **PowerShell module** (`module/PiNotify.psm1`, `PiNotify.psd1`) — `Send-PiNotify`, `Get-PiInbox`, `Get-PiDaemonStatus`, `Stop-PiDaemon`
-- **Scoop manifest** (`packaging/scoop/pi-notify.json`)
-- **Homebrew formula** (`packaging/homebrew/pi-notify.rb`)
+- **PowerShell module** (`module/PiPager.psm1`, `PiPager.psd1`) — `Send-PiPage`, `Get-PiPagerInbox`, `Get-PiPagerDaemonStatus`, `Stop-PiPagerDaemon`
+- **Scoop manifest** (`packaging/scoop/pi-pager.json`)
+- **Homebrew formula** (`packaging/homebrew/pi-pager.rb`)
 - **Logo + social banner** (`assets/logo-*.png`, `social-1280x640.png`) — generated via Pillow
 - **CHANGELOG.md** + **CONTRIBUTING.md**
 - **Known Issues** and **Troubleshooting** sections in README
@@ -51,13 +74,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Background streaming daemon (`inbox-daemon.ps1`) with auto-reconnect
 - `inbox.ps1` reader (local log or network fallback)
 - Auto project tagging (walks to `.git` root)
-- Per-project overrides via `.pi-notify.json`
+- Per-project overrides via `.pi-pager.json`
 - Optional Discord + Slack webhook channels
 - `install.ps1` / `uninstall.ps1`
 - Auto-start via Windows Startup folder
 - Drop-in agent prompts for Pi, Claude Code, Cursor
 - PSScriptAnalyzer + parse-check CI workflow
 
-[0.2.1]: https://github.com/CymatiStatic/pi-notify/releases/tag/v0.2.1
-[0.2.0]: https://github.com/CymatiStatic/pi-notify/releases/tag/v0.2.0
-[0.1.0]: https://github.com/CymatiStatic/pi-notify/releases/tag/v0.1.0
+[0.3.0]: https://github.com/CymatiStatic/pi-pager/releases/tag/v0.3.0
+[0.2.1]: https://github.com/CymatiStatic/pi-pager/releases/tag/v0.2.1
+[0.2.0]: https://github.com/CymatiStatic/pi-pager/releases/tag/v0.2.0
+[0.1.0]: https://github.com/CymatiStatic/pi-pager/releases/tag/v0.1.0

@@ -1,13 +1,13 @@
-# PiNotify.psm1 — PowerShell module wrapper around pi-notify scripts.
+# PiPager.psm1 — PowerShell module wrapper around pi-pager scripts.
 # Publish: Publish-Module -Path .\module -NuGetApiKey <key>
 
 $script:ScriptDir = Join-Path $PSScriptRoot '..' 'scripts' | Resolve-Path -ErrorAction SilentlyContinue
 if (-not $script:ScriptDir) { $script:ScriptDir = Join-Path $PSScriptRoot 'scripts' }
 
-function Send-PiNotify {
+function Send-PiPage {
     <#
     .SYNOPSIS
-    Fire a pi-notify alert on all enabled channels.
+    Fire a pi-pager alert on all enabled channels.
     .PARAMETER Type
     Alert type: input | done | warn | error
     .PARAMETER Message
@@ -17,9 +17,9 @@ function Send-PiNotify {
     .PARAMETER Wait
     Block until a reply arrives on ntfy (max -TimeoutSec).
     .EXAMPLE
-    Send-PiNotify -Type done -Message 'Build passed'
+    Send-PiPage -Type done -Message 'Build passed'
     .EXAMPLE
-    $reply = Send-PiNotify -Type input -Message 'Deploy to prod?' -Wait -TimeoutSec 60
+    $reply = Send-PiPage -Type input -Message 'Deploy to prod?' -Wait -TimeoutSec 60
     #>
     [CmdletBinding()]
     param(
@@ -36,14 +36,14 @@ function Send-PiNotify {
     & $scriptPath @args
 }
 
-function Get-PiInbox {
+function Get-PiPagerInbox {
     <#
     .SYNOPSIS
     Read messages sent to the agent from your phone.
     .PARAMETER Since
     Duration like '10m', '1h', '30s'. Default 10m.
     .EXAMPLE
-    Get-PiInbox -Since 1h
+    Get-PiPagerInbox -Since 1h
     #>
     [CmdletBinding()]
     param(
@@ -58,10 +58,10 @@ function Get-PiInbox {
     & $scriptPath @args
 }
 
-function Get-PiDaemonStatus {
+function Get-PiPagerDaemonStatus {
     <#
     .SYNOPSIS
-    Check if the pi-notify inbox daemon is running.
+    Check if the pi-pager inbox daemon is running.
     #>
     [CmdletBinding()]
     param()
@@ -69,11 +69,11 @@ function Get-PiDaemonStatus {
     & $scriptPath -Status
 }
 
-function Stop-PiDaemon {
+function Stop-PiPagerDaemon {
     [CmdletBinding()]
     param()
     $scriptPath = Join-Path $script:ScriptDir 'inbox-daemon.ps1'
     & $scriptPath -Stop
 }
 
-Export-ModuleMember -Function Send-PiNotify, Get-PiInbox, Get-PiDaemonStatus, Stop-PiDaemon
+Export-ModuleMember -Function Send-PiPage, Get-PiPagerInbox, Get-PiPagerDaemonStatus, Stop-PiPagerDaemon

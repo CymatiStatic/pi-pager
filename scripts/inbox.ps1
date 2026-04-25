@@ -1,6 +1,6 @@
 # inbox.ps1 — read messages sent to the agent from your phone (via ntfy)
 # Uses local daemon log (fast, offline-capable) with ntfy network poll as fallback.
-# https://github.com/CymatiStatic/pi-notify
+# https://github.com/CymatiStatic/pi-pager
 
 param(
     [string]$Since     = '10m',
@@ -11,7 +11,7 @@ param(
     [string]$Project   = $null      # explicitly filter to this project (instead of auto-detect)
 )
 
-$dataDir = Join-Path $env:USERPROFILE '.pi-notify'
+$dataDir = Join-Path $env:USERPROFILE '.pi-pager'
 $cfgPath = Join-Path $dataDir 'notify.config.json'
 if (-not (Test-Path $cfgPath)) { Write-Error "Config not found. Run install.ps1."; exit 1 }
 $cfg = Get-Content $cfgPath -Raw | ConvertFrom-Json
